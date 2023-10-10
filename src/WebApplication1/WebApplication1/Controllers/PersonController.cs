@@ -5,76 +5,77 @@ using WebApplication1.Repository;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-[Route("[persons]")]
+[Route("persons")]
 public class PersonController : ControllerBase
 {
-    private PersonRepository _personRepository;
+    private IPersonRepository _personRepository;
 
-    public PersonController(PersonRepository personRepository)
+    public PersonController(IPersonRepository personRepository)
     {
         _personRepository = personRepository;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Person>> GetPersons()
+    public async Task<ActionResult<IEnumerable<Person>>> GetPersons()
     {
-        var result = _personRepository.GetAllPersons();
+        var result = await _personRepository.GetAllPersons();
         return Ok(result);
     }
     
     [HttpGet("{id}")]
-    public ActionResult<Person> GetPersonById(int id)
+    public async Task<ActionResult<Person>> GetPersonById(int id)
     {
         try
         {
-            var result = _personRepository.GetPersonById(id);
+            var result = await _personRepository.GetPersonById(id);
             return Ok(result);
         }
-        catch
+        catch (ArgumentException ex)
         {
-            return NotFound();
+            return NotFound(ex.Message);
         }
     }
     
     [HttpPost]
-    public ActionResult PostPerson(Person person)
+    public async Task<ActionResult> PostPerson(Person person)
     {
         try
         {
-            _personRepository.AddPerson(person);
+            await _personRepository.AddPerson(person);
         }
-        catch
+        catch (ArgumentException ex)
         {
-            return BadRequest();
+            return BadRequest(ex.Message);
         }
-        return Ok(person.Id);
+        var personId = person.Id;
+        return Created("persons/{personId}", null);
     }
     
     [HttpDelete("{id}")]
-    public ActionResult DeletePerson(int id)
+    public async Task<ActionResult> DeletePerson(int id)
     {
         try
         {
-            _personRepository.DeletePerson(id);
+            await _personRepository.DeletePerson(id);
         }
-        catch
+        catch (ArgumentException ex)
         {
-            return NotFound();
+            return NotFound(ex.Message);
         }
         return Ok();
 
     }
     
     [HttpPatch("{id}")]
-    public ActionResult PatchPerson(int id)
+    public async Task<ActionResult> PatchPerson(int id)
     {
         try
         {
-            _personRepository.UpdatePerson(id);
+            await _personRepository.UpdatePerson(id);
         }
-        catch
+        catch (ArgumentException ex)
         {
-            return NotFound();
+            return NotFound(ex.Message);
         }
         return Ok();
     }

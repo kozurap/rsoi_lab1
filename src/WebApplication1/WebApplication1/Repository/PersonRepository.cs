@@ -1,52 +1,56 @@
-﻿using WebApplication1.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Domain;
 
 namespace WebApplication1.Repository
 {
-    public class PersonRepository
+    public class PersonRepository : IPersonRepository
     {
-        PersonContext context;
+        private readonly PersonContext context;
 
-        PersonRepository(PersonContext context)
+        public PersonRepository(PersonContext context)
         {
             this.context = context;
         }
 
-        public Person GetPersonById(int Id)
+        public async Task<Person> GetPersonById(int Id)
         {
-            var person = context.Persons.FirstOrDefault(x => x.Id == Id);
+            var person = await context.Persons.FirstOrDefaultAsync(x => x.Id == Id);
             if (person is null)
             {
-                throw new Exception($"Person with Id {Id} does not exists");
+                throw new ArgumentException($"Person with Id {Id} does not exists");
             }
             return person;
         }
-        public IEnumerable<Person> GetAllPersons() => context.Persons.ToArray();
-        public void AddPerson (Person person)
+        public async Task<IEnumerable<Person>> GetAllPersons() => await context.Persons.ToArrayAsync();
+        public async Task AddPerson (Person person)
         {
-            var newPerson = context.Persons.FirstOrDefault(x => x.Id == person.Id);
-            if (person is not null)
+            var newPerson = await context.Persons.FirstOrDefaultAsync(x => x.Id == person.Id);
+            if (newPerson is not null)
             {
-                throw new Exception($"Person with Id {person.Id} does exists");
+                throw new ArgumentException($"Person with Id {person.Id} does exists");
             }
-            context.Persons.Add(person);
+            await context.Persons.AddAsync(person);
+            await context.SaveChangesAsync();
         }
-        public void UpdatePerson (int Id)
+        public async Task UpdatePerson(int Id)
         {
-            var person = context.Persons.FirstOrDefault(x => x.Id == Id);
+            var person = await context.Persons.FirstOrDefaultAsync(x => x.Id == Id);
             if (person is null)
             {
-                throw new Exception($"Person with Id {Id} does not exists");
+                throw new ArgumentException($"Person with Id {Id} does not exists");
             }
             context.Persons.Update(person);
+            await context.SaveChangesAsync();
         }
-        public void DeletePerson(int Id)
+        public async Task DeletePerson(int Id)
         {
-            var person = context.Persons.FirstOrDefault(x => x.Id == Id);
+            var person = await context.Persons.FirstOrDefaultAsync(x => x.Id == Id);
             if (person is null)
             {
-                throw new Exception($"Person with Id {Id} does not exists");
+                throw new ArgumentException($"Person with Id {Id} does not exists");
             }
             context.Persons.Remove(person);
+            await context.SaveChangesAsync();
         }
     }
 }
