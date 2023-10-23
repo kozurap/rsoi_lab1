@@ -10,7 +10,7 @@ WORKDIR /src
 COPY ["WebApplication1/WebApplication1.csproj", "WebApplication1/"]
 RUN dotnet restore "WebApplication1/WebApplication1.csproj"
 COPY . .
-WORKDIR "/src/WebApplication1"
+WORKDIR "WebApplication1"
 RUN dotnet build "WebApplication1.csproj" -c Debug -o /app/build
 
 FROM build AS publish
