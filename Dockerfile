@@ -6,7 +6,7 @@ EXPOSE 5000
 EXPOSE 5001
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
+WORKDIR /rsoi_lab1/WebApplication1
 COPY ["WebApplication1/WebApplication1.csproj", "WebApplication1/"]
 RUN dotnet restore "WebApplication1/WebApplication1.csproj"
 COPY . .
