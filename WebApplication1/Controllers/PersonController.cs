@@ -48,7 +48,7 @@ public class PersonController : ControllerBase
             return BadRequest(ex.Message);
         }
         var personId = person.Id;
-        return Created("persons/{personId}", null);
+        return Created($"persons/{personId}", null);
     }
     
     [HttpDelete("{id}")]
